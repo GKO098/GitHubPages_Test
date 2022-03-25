@@ -1,9 +1,43 @@
-<html>
-<head><title>あいうえお</title></head>
+<head>
+  <title>CSVファイルを読み込み、表示</title>
+</head>
 <body>
-かきくけこ。<br>
-さしすせそ<p>
-たちつてと
-<script src="output_csv.js"></script>
+  <section class="section">
+    <h1 class="title">JavaScriptでCSVファイルを読み込んでテーブルに表示</h1>
+    <div class="columns">
+      <div class="column">
+        <article class="message is-primary">
+          <div class="message-body">
+            <span id="message">ファイルを選択してください。</span>
+          </div>
+        </article>
+      </div>
+    </div>
+
+    <div class="columns">
+      <div class="column">
+        <input id="csv_file" type="file">
+      </div>
+    </div>
+
+    <div class="columns">
+      <div class="column" style="overflow-y: scroll;">
+        <table id="csv_data_table" class="table is-bordered">
+          <thead>
+            <tr>
+              <th>id</th>
+              <th>ファイル名</th>
+              <th>URL</th>
+              <th>カテゴリ</th>
+              <th>作成日時</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <script src="js/scripts.js"></script>
 </body>
 </html>
