@@ -14,7 +14,7 @@ fileInput.onchange = () => {
 let items = [];
 fileReader.onload = () => {
   // ファイル読み込み
-  let fileResult = fileReader.result.split('\r\n');
+  let fileResult = fileReader.result.split('\n');
 
   // 先頭行をヘッダとして格納
   let header = fileResult[0].split(',')
