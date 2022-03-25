@@ -58,3 +58,7 @@ fileReader.onerror = () => {
   items = [];
   message.innerHTML = "ファイル読み取りに失敗しました。"
 }
+
+document.getElementById("text-button").onclick = function() {
+    document.getElementById("text").innerHTML = "クリックされた！";
+  };
