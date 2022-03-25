@@ -7,7 +7,7 @@ fileInput.onchange = () => {
   message.innerHTML = "読み込み中..."
 
   let file = fileInput.files[0];
-  fileReader.readAsText(file);
+  fileReader.readAsText(file, "Shift_JIS");
 };
 
 // ファイル読み込み時
@@ -15,6 +15,11 @@ let items = [];
 fileReader.onload = () => {
   // ファイル読み込み
   let fileResult = fileReader.result.split('\r\n');
+
+  // 先頭行をヘッダとして格納
+  let header = fileResult[0].split(',')
+  // 先頭行の削除
+  fileResult.shift();
 
   // CSVから情報を取得
   items = fileResult.map(item => {
@@ -44,6 +49,7 @@ fileReader.onload = () => {
       `
   }
   tbody.innerHTML = tbody_html;
+
   message.innerHTML = items.length + "件のデータを読み込みました。"
 }
 
