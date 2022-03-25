@@ -1,1 +1,1 @@
-console.log("JavaScript!");
+alert("Hello World!")
