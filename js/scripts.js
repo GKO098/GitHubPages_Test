@@ -30,7 +30,10 @@ fileReader.onload = () => {
       let key = header[index];
       result[key] = datas[index];
     }
-    result["postage"] = 100;
+    // 送料の計算
+    result["postage"] = result["amount1"] * 100 + result["amount2"] * 10;
+
+    // 返却
     return result;
   });
 
@@ -40,6 +43,7 @@ fileReader.onload = () => {
 
   //　CSVの内容を表示
   let tbody_html = "";
+  let output_data = "";
   for (item of items) {
     tbody_html += `<tr>
         <td>${item.id}</td>
@@ -53,6 +57,7 @@ fileReader.onload = () => {
         <td>${item.postage}</td>
       </tr>
       `
+      output_data += `${item.id},${item.date},${item.customer},${item.address},${item.item1},${item.amount1},${item.item2},${item.amount2},${item.postage}\n`
   }
   tbody.innerHTML = tbody_html;
 
@@ -60,8 +65,7 @@ fileReader.onload = () => {
   
   // ダウンロード関連
   let bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
-  let data = "a,b,c\n1,2,3";
-  let blob = new Blob([bom, data], {'type' : 'text/csv'});
+  let blob = new Blob([bom, output_data], {'type' : 'text/csv'});
 
   let downloadLink = document.createElement('a');
   downloadLink.download = 'sample.csv';
