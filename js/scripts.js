@@ -7,7 +7,12 @@ fileInput.onchange = () => {
   message.innerHTML = "読み込み中..."
 
   let file = fileInput.files[0];
-  fileReader.readAsText(file);
+  // CSVファイルかを確認
+  if (file.type != 'text/csv') {
+    message.innerHTML = "CSVファイルを選択してください。";
+    return;
+  }
+  fileReader.readAsText(file); 
 };
 
 // ファイル読み込み時
