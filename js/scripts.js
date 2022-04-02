@@ -1,10 +1,23 @@
+price_table = {
+  東京都:["0", "150", "280", "400", "500"],
+  大阪府:["0", "200", "390", "580", "760"],
+  その他:["0", "350", "700", "1000", "1750"]
+};
 function get_area_and_price(area, amount) {
-  if (/東京都/.test(area)) {
-    table_path = "tables/13_tokyo.csv";
-    // return get_price_table(table_path);
-    return "東京都";
+  amount = parseInt(amount, 10)
+  if (isNaN(amount)) {
+    return "数量の解釈に失敗しました";
   }
-  return "その他";
+
+  price_list = []
+  if (/東京都/.test(area)) {
+    price_list = price_table["東京都"];
+  } else if (/大阪府/.test(area)) {
+    price_list = ["0", "200", "390", "580", "760"];
+  } else {
+    price_list = ["0", "350", "700", "1000", "1750"];
+  } 
+  return price_list[amount];
 }
 
 let fileInput = document.getElementById('csv_file');
