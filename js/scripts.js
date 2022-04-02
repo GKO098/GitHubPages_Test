@@ -1,7 +1,7 @@
 price_table = {
-  東京都:["0", "150", "280", "400", "500"],
-  大阪府:["0", "200", "390", "580", "760"],
-  その他:["0", "350", "700", "1000", "1750"]
+  東京都:["0", "150", "280", "400", "500", "?"],
+  大阪府:["0", "200", "390", "580", "760", "?"],
+  その他:["0", "350", "700", "1000", "1750", "?"]
 };
 
 
@@ -9,16 +9,15 @@ price_table = {
 // 金額テーブル初期化
 let tbody_price = document.querySelector('#price_table tbody');
 tbody_price.innerHTML = "";
-for (var key in price_table){
-  tbody_price.innerHTML += `<tr>
-  <td>${key}</td>
-  <td>${price_table[key][1]}</td>
-  <td>${price_table[key][2]}</td>
-  <td>${price_table[key][3]}</td>
-  <td>${price_table[key][4]}</td>
-  <td>${price_table[key][5]}</td>
-</tr>
-`
+for (var key in price_table) {
+  table_html = `<tr>
+  <td>${key}</td>`;
+  for (var index in price_table[key]) {
+    table_html += `<td>${price_table[key][index]}</td>`;
+  }
+  table_html += `</tr>`
+  tbody_price.innerHTML += table_html
+  console.log(tbody_price.innerHTML)
 }
 
 
@@ -32,10 +31,14 @@ function get_area_and_price(area, amount) {
   if (/東京都/.test(area)) {
     price_list = price_table["東京都"];
   } else if (/大阪府/.test(area)) {
-    price_list = ["0", "200", "390", "580", "760"];
+    price_list = price_table["大阪府"];
   } else {
-    price_list = ["0", "350", "700", "1000", "1750"];
+    price_list = price_table["その他"];
   } 
+  console.log(price_list)
+  // if (amount > price_list.length()) {
+  //   return "量が多すぎます";
+  // }
   return price_list[amount];
 }
 
@@ -91,7 +94,7 @@ fileReader.onload = () => {
   let tbody_html = "";
   let output_data = "";
   for (item of items) {
-    item.test_output = get_area_and_price(item.address, item.amount1)
+    item.postage = get_area_and_price(item.address, item.amount1)
     tbody_html += `<tr>
         <td>${item.id}</td>
         <td>${item.date}</td>
@@ -102,12 +105,11 @@ fileReader.onload = () => {
         <td>${item.item2}</td>
         <td>${item.amount2}</td>
         <td>${item.postage}</td>
-        <td>${item.test_output}</td>
       </tr>
       `
-      output_data += `${item.id},${item.date},${item.customer},${item.address},${item.item1},${item.amount1},${item.item2},${item.amount2},${item.postage},${item.test_output}\n`
+      tbody.innerHTML = tbody_html;
+      output_data += `${item.id},${item.date},${item.customer},${item.address},${item.item1},${item.amount1},${item.item2},${item.amount2},${item.postage}\n`
   }
-  tbody.innerHTML = tbody_html;
 
   message.innerHTML = items.length + "件のデータを読み込みました。"
   
