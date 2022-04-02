@@ -1,7 +1,7 @@
 price_table = {
-  東京都:["0", "100", "200", "300", "400"],
-  大阪府:["0", "110", "220", "330", "440"],
-  その他:["0", "111", "222", "333", "444"]
+  東京都:["100", "200", "300", "400"],
+  大阪府:["110", "220", "330", "440"],
+  その他:["111", "222", "333", "444"]
 };
 
 weight_table = {
@@ -39,10 +39,10 @@ for (var key in weight_table) {
 function get_postage(area, weight) {
   // 宛先と重さから、送料の取得
   weight = parseInt(weight, 10)
-  if (isNaN(weight)) {
+  if (isNaN(weight) || weight <= 0) {
     return "重量計算に失敗";
   }
-  weight_index = 1 + Math.ceil(weight/5) ;
+  weight_index =  Math.ceil(weight/5) - 1;
 
   price_list = []
   if (/東京都/.test(area)) {
@@ -147,7 +147,7 @@ fileReader.onload = () => {
   let blob = new Blob([bom, output_data], {'type' : 'text/csv'});
 
   let downloadLink = document.createElement('a');
-  downloadLink.download = 'sample.csv';
+  downloadLink.download = 'output.csv';
   downloadLink.href = URL.createObjectURL(blob);
   downloadLink.dataset.downloadurl = ['text/plain', downloadLink.download, downloadLink.href].join(':');
   downloadLink.click();
