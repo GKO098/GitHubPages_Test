@@ -1,31 +1,48 @@
 price_table = {
-  東京都:["0", "150", "280", "400", "500", "?"],
-  大阪府:["0", "200", "390", "580", "760", "?"],
-  その他:["0", "350", "700", "1000", "1750", "?"]
+  東京都:["0", "100", "200", "300", "400"],
+  大阪府:["0", "110", "220", "330", "440"],
+  その他:["0", "111", "222", "333", "444"]
 };
 
-
+weight_table = {
+  A:3,
+  B:2,
+  C:1,
+  D:0
+};
 
 // 金額テーブル初期化
 let tbody_price = document.querySelector('#price_table tbody');
 tbody_price.innerHTML = "";
 for (var key in price_table) {
   table_html = `<tr>
-  <td>${key}</td>`;
+  <td>${key}</td>
+  `;
   for (var index in price_table[key]) {
     table_html += `<td>${price_table[key][index]}</td>`;
   }
-  table_html += `</tr>`
-  tbody_price.innerHTML += table_html
-  console.log(tbody_price.innerHTML)
+  table_html += `</tr>`;
+  tbody_price.innerHTML += table_html;
+}
+
+// 重量テーブル初期化
+let tbody_weight = document.querySelector('#weight_table tbody');
+tbody_weight.innerHTML = "";
+for (var key in weight_table) {
+  table_html = `<tr><td>${key}</td><td>${weight_table[key]}</td></tr>
+  `;
+  tbody_weight.innerHTML += table_html;
+  console.log(tbody_weight.innerHTML);
 }
 
 
-function get_area_and_price(area, amount) {
-  amount = parseInt(amount, 10)
-  if (isNaN(amount)) {
-    return "数量の解釈に失敗しました";
+function get_postage(area, weight) {
+  // 宛先と重さから、送料の取得
+  weight = parseInt(weight, 10)
+  if (isNaN(weight)) {
+    return "重量計算に失敗";
   }
+  weight_index = 1 + Math.ceil(weight/5) ;
 
   price_list = []
   if (/東京都/.test(area)) {
@@ -36,11 +53,22 @@ function get_area_and_price(area, amount) {
     price_list = price_table["その他"];
   } 
   console.log(price_list)
-  // if (amount > price_list.length()) {
-  //   return "量が多すぎます";
-  // }
-  return price_list[amount];
+  if (weight_index > price_list.length) {
+    return "重量過多";
+  }
+  return price_list[weight_index];
 }
+
+function get_weight(item_type, amount) {
+  // 商品名と量から、重さを取得
+  if (item_type in weight_table) {
+    return weight_table[item_type] * amount;
+  } else {
+    console.log(`${item_type}の情報がありません`);
+  }
+  return NaN;
+}
+
 
 let fileInput = document.getElementById('csv_file');
 let message = document.getElementById('message');
@@ -73,15 +101,11 @@ fileReader.onload = () => {
   // CSVから情報を取得
   items = fileResult.map(item => {
     let datas = item.split(',');
-    datas.push("postage")
     let result = {};
     for (const index in datas) {
       let key = header[index];
       result[key] = datas[index];
     }
-    // 送料の計算
-    result["postage"] = result["amount1"] * 100 + result["amount2"] * 10;
-
     // 返却
     return result;
   });
@@ -94,21 +118,26 @@ fileReader.onload = () => {
   let tbody_html = "";
   let output_data = "";
   for (item of items) {
-    item.postage = get_area_and_price(item.address, item.amount1)
+    item.weight = 0
+    item.weight += get_weight(item.item1, item.amount1);
+    item.weight += get_weight(item.item2, item.amount2);
+    item.postage = get_postage(item.address, item.weight);
+
     tbody_html += `<tr>
-        <td>${item.id}</td>
-        <td>${item.date}</td>
-        <td>${item.customer}</td>
-        <td>${item.address}</td>
-        <td>${item.item1}</td>
-        <td>${item.amount1}</td>
-        <td>${item.item2}</td>
-        <td>${item.amount2}</td>
-        <td>${item.postage}</td>
-      </tr>
-      `
-      tbody.innerHTML = tbody_html;
-      output_data += `${item.id},${item.date},${item.customer},${item.address},${item.item1},${item.amount1},${item.item2},${item.amount2},${item.postage}\n`
+    <td>${item.id}</td>
+    <td>${item.date}</td>
+    <td>${item.customer}</td>
+    <td>${item.address}</td>
+    <td>${item.item1}</td>
+    <td>${item.amount1}</td>
+    <td>${item.item2}</td>
+    <td>${item.amount2}</td>
+    <td>${item.weight}</td>
+    <td>${item.postage}</td>
+    </tr>
+    `
+    tbody.innerHTML = tbody_html;
+    output_data += `${item.id},${item.date},${item.customer},${item.address},${item.item1},${item.amount1},${item.item2},${item.amount2},${item.weight},${item.postage}\n`
   }
 
   message.innerHTML = items.length + "件のデータを読み込みました。"

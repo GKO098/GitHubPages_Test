@@ -7,9 +7,7 @@
 </head>
 <body>
   <section class="section">
-
     <h1 class="title">JavaScriptでCSVファイルを読み込んでテーブルに表示する</h1>
-
     <div class="columns">
       <div class="column">
         <article class="message is-primary">
@@ -31,7 +29,7 @@
         <table id="csv_data_table" class="table is-bordered">
           <thead>
             <tr>
-              <th>id</th>
+              <th>顧客id</th>
               <th>日付</th>
               <th>顧客名</th>
               <th>宛先</th>
@@ -39,31 +37,53 @@
               <th>商品1の数量</th>
               <th>商品2</th>
               <th>商品2の数量</th>
+              <th>重量</th>
               <th>送料</th>
             </tr>
           </thead>
-          <tbody></tbody>
+          <tbody>
+          </tbody>
         </table>
       </div>
     </div>
 
-  <hr>
-  <h3 class="subtitle">計算に用いている表</h3>
+    <hr>
+    <h3 class="subtitle">計算に用いている送料の表</h3>
     <div class="columns">
       <div class="column" style="overflow-y: scroll;">
         <table id="price_table" class="table is-bordered">
           <thead>
             <tr>
+              <th></th>
+              <th align="center" colspan="5">重量</th>
+            </tr>
+            <tr>
               <th>エリア</th>
-              <th>数量=0</th>
-              <th>数量=1</th>
-              <th>数量=2</th>
-              <th>数量=3</th>
-              <th>数量=4</th>
-              <th>数量>=5</th>
+              <th>〜5</th>
+              <th>〜10</th>
+              <th>〜15</th>
+              <th>〜20</th>
+              <th>〜25</th>
             </tr>
           </thead>
-          <tbody></tbody>
+          <tbody>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <hr>
+    <h3 class="subtitle">計算に用いている重量の表</h3>
+    <div class="columns">
+      <div class="column" style="overflow-y: scroll;">
+        <table id="weight_table" class="table is-bordered">
+          <thead>
+            <tr>
+              <th>商品名</th>
+              <th>重量</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
         </table>
       </div>
     </div>
