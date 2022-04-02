@@ -1,3 +1,12 @@
+function get_area_and_price(area, amount) {
+  if (/東京都/.test(area)) {
+    table_path = "tables/13_tokyo.csv";
+    // return get_price_table(table_path);
+    return "東京都";
+  }
+  return "その他";
+}
+
 let fileInput = document.getElementById('csv_file');
 let message = document.getElementById('message');
 let fileReader = new FileReader();
@@ -12,7 +21,7 @@ fileInput.onchange = () => {
     message.innerHTML = "CSVファイルを選択してください。";
     return;
   }
-  fileReader.readAsText(file); 
+  fileReader.readAsText(file);
 };
 
 // ファイル読み込み時
@@ -50,6 +59,7 @@ fileReader.onload = () => {
   let tbody_html = "";
   let output_data = "";
   for (item of items) {
+    item.test_output = get_area_and_price(item.address, item.amount1)
     tbody_html += `<tr>
         <td>${item.id}</td>
         <td>${item.date}</td>
@@ -60,9 +70,10 @@ fileReader.onload = () => {
         <td>${item.item2}</td>
         <td>${item.amount2}</td>
         <td>${item.postage}</td>
+        <td>${item.test_output}</td>
       </tr>
       `
-      output_data += `${item.id},${item.date},${item.customer},${item.address},${item.item1},${item.amount1},${item.item2},${item.amount2},${item.postage}\n`
+      output_data += `${item.id},${item.date},${item.customer},${item.address},${item.item1},${item.amount1},${item.item2},${item.amount2},${item.postage},${item.test_output}\n`
   }
   tbody.innerHTML = tbody_html;
 
