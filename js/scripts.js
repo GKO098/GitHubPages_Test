@@ -3,6 +3,25 @@ price_table = {
   大阪府:["0", "200", "390", "580", "760"],
   その他:["0", "350", "700", "1000", "1750"]
 };
+
+
+
+// 金額テーブル初期化
+let tbody_price = document.querySelector('#price_table tbody');
+tbody_price.innerHTML = "";
+for (var key in price_table){
+  tbody_price.innerHTML += `<tr>
+  <td>${key}</td>
+  <td>${price_table[key][1]}</td>
+  <td>${price_table[key][2]}</td>
+  <td>${price_table[key][3]}</td>
+  <td>${price_table[key][4]}</td>
+  <td>${price_table[key][5]}</td>
+</tr>
+`
+}
+
+
 function get_area_and_price(area, amount) {
   amount = parseInt(amount, 10)
   if (isNaN(amount)) {
