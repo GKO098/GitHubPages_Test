@@ -138,8 +138,8 @@ fileReader.onload = () => {
   for (var key in data_by_supplier_code) {
     delivery_slip_numbers = Array.from(new Set(data_by_supplier_code[key][1])).join(";")
     tbody_html += `<tr>
-      <td>${key}</td>
-      <td>${Math.round(data_by_supplier_code[key][0]*100)/100}</td>
+      <td align="right">${key}</td>
+      <td align="right">${Math.round(data_by_supplier_code[key][0]*100)/100}</td>
       <td>${delivery_slip_numbers}</td>
     </tr>`
     tbody.innerHTML = tbody_html;
