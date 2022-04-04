@@ -1,6 +1,0 @@
-id,date,customer,address,item1,amount1,item2,amount2
-1,2022/3/26,hoge株式会社,東京都1-2-3,A,2,B,3
-2,2022/3/26,fuga Inc.,大阪府10-20-30,C,1,B,2
-3,2022/3/26,piyoさん,太陽,A,,B,1
-4,2022/3/26,una,東京都,X,1,Y,1
-5,2022/3/26,pue,東京都,A,100,B,100
