@@ -52,6 +52,14 @@ function get_weight(item_type, amount) {
 }
 
 
+function get_tomorrow() {
+  const today = new Date()
+  var yyyy = today.getFullYear();
+  var mm = ('0' + (today.getMonth() + 1)).slice(-2);
+  var dd = ('0' + today.getDate() + 1).slice(-2);
+  return (yyyy + '-' + mm + '-' + dd);
+}
+
 let fileInput = document.getElementById('csv_file');
 let message = document.getElementById('message');
 let fileReader = new FileReader();
