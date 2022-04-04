@@ -85,6 +85,19 @@ fileReader.onload = () => {
 
   // 先頭行をヘッダとして格納
   let header = fileResult[0].split(',')
+  for (var head in header) { // 使いそうな物は変数名らしい名前に置き換える
+    if (header[head].match(/.*取引先コード \(得意先\).*/)) {
+      header[head] = "supplier_code"
+    } else if (header[head].match(/.*納品書番号.*/)) {
+      header[head] = "delivery_slip_number"
+    } else if (header[head].match(/.*出荷指定日.*/)) {
+      header[head] = "shipment_date"
+    } else if (header[head].match(/.*納品数.*/)) {
+      header[head] = "amount"
+    } else if (header[head].match(/.*積数.*/)) {
+      header[head] = "volume_per_unit"
+    }
+  }
   // 先頭行の削除
   fileResult.shift();
 
@@ -107,21 +120,30 @@ fileReader.onload = () => {
   //　CSVの内容を表示
   let tbody_html = "";
   let output_data = "";
+  let data_by_supplier_code = {}
+  tomorrow = get_tomorrow()
+  for (item of items) { // 出荷指定日が今日以前の物を読み込み
+    if (!item.supplier_code) { //空白行は追加しない（主に最後の空行）
+      continue;
+    }
+    if (item.shipment_date >= tomorrow) { // 出荷指定日が明日以降なら追加しない
+      continue;
+    }
+    if (item.supplier_code in data_by_supplier_code) {
+      data_by_supplier_code[item.supplier_code][0] += item.amount * item.volume_per_unit;
+      data_by_supplier_code[item.supplier_code][1] += ";" + item.delivery_slip_number;
+    } else {
+      data_by_supplier_code[item.supplier_code] = [item.amount * item.volume_per_unit, item.delivery_slip_number];
+    }
+  }
+  for (var key in data_by_supplier_code) {
     tbody_html += `<tr>
-    <td>${item.id}</td>
-    <td>${item.date}</td>
-    <td>${item.customer}</td>
-    <td>${item.address}</td>
-    <td>${item.item1}</td>
-    <td>${item.amount1}</td>
-    <td>${item.item2}</td>
-    <td>${item.amount2}</td>
-    <td>${item.weight}</td>
-    <td>${item.postage}</td>
-    </tr>
-    `
+      <td>${key}</td>
+      <td>${Math.round(data_by_supplier_code[key][0]*100)/100}</td>
+      <td>${data_by_supplier_code[key][1]}</td>
+    </tr>`
     tbody.innerHTML = tbody_html;
-    output_data += `${item.id},${item.date},${item.customer},${item.address},${item.item1},${item.amount1},${item.item2},${item.amount2},${item.weight},${item.postage}\n`
+    output_data += `${item.supplier_code},${item.delivery_slip_number},${item.shipment_date},${item.amount},${item.volume_per_unit}\n`
   }
 
   message.innerHTML = items.length + "件のデータを読み込みました。"
