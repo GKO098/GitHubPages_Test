@@ -34,7 +34,6 @@ function get_postage(area, weight) {
   } else {
     price_list = price_table["その他"];
   } 
-  console.log(price_list)
   if (weight_index > price_list.length) {
     return "重量過多";
   }
