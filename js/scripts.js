@@ -142,7 +142,7 @@ fileReader.onload = () => {
       <td>${data_by_supplier_code[key][1]}</td>
     </tr>`
     tbody.innerHTML = tbody_html;
-    output_data += `${item.supplier_code},${item.delivery_slip_number},${item.shipment_date},${item.amount},${item.volume_per_unit}\n`
+    output_data += `${key},${Math.round(data_by_supplier_code[key][0]*100)/100},${data_by_supplier_code[key][1]}\n`
   }
 
   message.innerHTML = items.length + "件のデータを読み込みました。"
