@@ -4,13 +4,6 @@ price_table = {
   その他:["111", "222", "333", "444"]
 };
 
-weight_table = {
-  A:3,
-  B:2,
-  C:1,
-  D:0
-};
-
 // 金額テーブル初期化
 let tbody_price = document.querySelector('#price_table tbody');
 tbody_price.innerHTML = "";
@@ -24,17 +17,6 @@ for (var key in price_table) {
   table_html += `</tr>`;
   tbody_price.innerHTML += table_html;
 }
-
-// 重量テーブル初期化
-let tbody_weight = document.querySelector('#weight_table tbody');
-tbody_weight.innerHTML = "";
-for (var key in weight_table) {
-  table_html = `<tr><td>${key}</td><td>${weight_table[key]}</td></tr>
-  `;
-  tbody_weight.innerHTML += table_html;
-  console.log(tbody_weight.innerHTML);
-}
-
 
 function get_postage(area, weight) {
   // 宛先と重さから、送料の取得
