@@ -2,12 +2,12 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8">
-  <title>JavaScriptでCSVファイルを読み込んでテーブルに表示する</title>
+  <title>出荷データを読み込み、取引先コード別に送料と納品書番号をまとめる</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.2/css/bulma.min.css">
 </head>
 <body>
   <section class="section">
-    <h1 class="title">JavaScriptでCSVファイルを読み込んでテーブルに表示する</h1>
+    <h1 class="title">出荷データを読み込み、取引先コード別に送料と納品書番号をまとめる</h1>
     <div class="columns">
       <div class="column">
         <article class="message is-primary">
@@ -29,16 +29,9 @@
         <table id="csv_data_table" class="table is-bordered">
           <thead>
             <tr>
-              <th>顧客id</th>
-              <th>日付</th>
-              <th>顧客名</th>
-              <th>宛先</th>
-              <th>商品1</th>
-              <th>商品1の数量</th>
-              <th>商品2</th>
-              <th>商品2の数量</th>
-              <th>重量</th>
-              <th>送料</th>
+              <th>取引先コード</th>
+              <th>総積数（後で送料に変換）</th>
+              <th>納品書番号リスト</th>
             </tr>
           </thead>
           <tbody>
@@ -71,21 +64,6 @@
       </div>
     </div>
     <hr>
-    <h3 class="subtitle">計算に用いている重量の表</h3>
-    <div class="columns">
-      <div class="column" style="overflow-y: scroll;">
-        <table id="weight_table" class="table is-bordered">
-          <thead>
-            <tr>
-              <th>商品名</th>
-              <th>重量</th>
-            </tr>
-          </thead>
-          <tbody>
-          </tbody>
-        </table>
-      </div>
-    </div>
   </section>
   <script src="js/scripts.js"></script>
 </body>

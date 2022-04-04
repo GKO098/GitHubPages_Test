@@ -4,13 +4,6 @@ price_table = {
   その他:["111", "222", "333", "444"]
 };
 
-weight_table = {
-  A:3,
-  B:2,
-  C:1,
-  D:0
-};
-
 // 金額テーブル初期化
 let tbody_price = document.querySelector('#price_table tbody');
 tbody_price.innerHTML = "";
@@ -24,17 +17,6 @@ for (var key in price_table) {
   table_html += `</tr>`;
   tbody_price.innerHTML += table_html;
 }
-
-// 重量テーブル初期化
-let tbody_weight = document.querySelector('#weight_table tbody');
-tbody_weight.innerHTML = "";
-for (var key in weight_table) {
-  table_html = `<tr><td>${key}</td><td>${weight_table[key]}</td></tr>
-  `;
-  tbody_weight.innerHTML += table_html;
-  console.log(tbody_weight.innerHTML);
-}
-
 
 function get_postage(area, weight) {
   // 宛先と重さから、送料の取得
@@ -52,7 +34,6 @@ function get_postage(area, weight) {
   } else {
     price_list = price_table["その他"];
   } 
-  console.log(price_list)
   if (weight_index > price_list.length) {
     return "重量過多";
   }
@@ -69,6 +50,14 @@ function get_weight(item_type, amount) {
   return NaN;
 }
 
+
+function get_tomorrow() {
+  const today = new Date()
+  var yyyy = today.getFullYear();
+  var mm = ('0' + (today.getMonth() + 1)).slice(-2);
+  var dd = ('0' + today.getDate() + 1).slice(-2);
+  return (yyyy + '-' + mm + '-' + dd);
+}
 
 let fileInput = document.getElementById('csv_file');
 let message = document.getElementById('message');
@@ -91,10 +80,23 @@ fileInput.onchange = () => {
 let items = [];
 fileReader.onload = () => {
   // ファイル読み込み
-  let fileResult = fileReader.result.split('\r\n');
+  let fileResult = fileReader.result.split(/\r|\n|\r\n/);
 
   // 先頭行をヘッダとして格納
   let header = fileResult[0].split(',')
+  for (var head in header) { // 使いそうな物は変数名らしい名前に置き換える
+    if (header[head].match(/.*取引先コード \(得意先\).*/)) {
+      header[head] = "supplier_code"
+    } else if (header[head].match(/.*納品書番号.*/)) {
+      header[head] = "delivery_slip_number"
+    } else if (header[head].match(/.*出荷指定日.*/)) {
+      header[head] = "shipment_date"
+    } else if (header[head].match(/.*納品数.*/)) {
+      header[head] = "amount"
+    } else if (header[head].match(/.*積数.*/)) {
+      header[head] = "volume_per_unit"
+    }
+  }
   // 先頭行の削除
   fileResult.shift();
 
@@ -117,27 +119,31 @@ fileReader.onload = () => {
   //　CSVの内容を表示
   let tbody_html = "";
   let output_data = "";
-  for (item of items) {
-    item.weight = 0
-    item.weight += get_weight(item.item1, item.amount1);
-    item.weight += get_weight(item.item2, item.amount2);
-    item.postage = get_postage(item.address, item.weight);
-
+  let data_by_supplier_code = {}
+  tomorrow = get_tomorrow()
+  for (item of items) { // 出荷指定日が今日以前の物を読み込み
+    if (!item.supplier_code) { //空白行は追加しない（主に最後の空行）
+      continue;
+    }
+    if (item.shipment_date >= tomorrow) { // 出荷指定日が明日以降なら追加しない
+      continue;
+    }
+    if (item.supplier_code in data_by_supplier_code) {
+      data_by_supplier_code[item.supplier_code][0] += item.amount * item.volume_per_unit;
+      data_by_supplier_code[item.supplier_code][1].push(item.delivery_slip_number);
+    } else {
+      data_by_supplier_code[item.supplier_code] = [item.amount * item.volume_per_unit, [item.delivery_slip_number]];
+    }
+  }
+  for (var key in data_by_supplier_code) {
+    delivery_slip_numbers = Array.from(new Set(data_by_supplier_code[key][1])).join(";")
     tbody_html += `<tr>
-    <td>${item.id}</td>
-    <td>${item.date}</td>
-    <td>${item.customer}</td>
-    <td>${item.address}</td>
-    <td>${item.item1}</td>
-    <td>${item.amount1}</td>
-    <td>${item.item2}</td>
-    <td>${item.amount2}</td>
-    <td>${item.weight}</td>
-    <td>${item.postage}</td>
-    </tr>
-    `
+      <td align="right">${key}</td>
+      <td align="right">${Math.round(data_by_supplier_code[key][0]*100)/100}</td>
+      <td>${delivery_slip_numbers}</td>
+    </tr>`
     tbody.innerHTML = tbody_html;
-    output_data += `${item.id},${item.date},${item.customer},${item.address},${item.item1},${item.amount1},${item.item2},${item.amount2},${item.weight},${item.postage}\n`
+    output_data += `${key},${Math.round(data_by_supplier_code[key][0]*100)/100},${delivery_slip_numbers}\n`
   }
 
   message.innerHTML = items.length + "件のデータを読み込みました。"
