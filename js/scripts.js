@@ -107,12 +107,6 @@ fileReader.onload = () => {
   //　CSVの内容を表示
   let tbody_html = "";
   let output_data = "";
-  for (item of items) {
-    item.weight = 0
-    item.weight += get_weight(item.item1, item.amount1);
-    item.weight += get_weight(item.item2, item.amount2);
-    item.postage = get_postage(item.address, item.weight);
-
     tbody_html += `<tr>
     <td>${item.id}</td>
     <td>${item.date}</td>
