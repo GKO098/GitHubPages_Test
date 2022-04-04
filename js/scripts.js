@@ -130,19 +130,20 @@ fileReader.onload = () => {
     }
     if (item.supplier_code in data_by_supplier_code) {
       data_by_supplier_code[item.supplier_code][0] += item.amount * item.volume_per_unit;
-      data_by_supplier_code[item.supplier_code][1] += ";" + item.delivery_slip_number;
+      data_by_supplier_code[item.supplier_code][1].push(item.delivery_slip_number);
     } else {
-      data_by_supplier_code[item.supplier_code] = [item.amount * item.volume_per_unit, item.delivery_slip_number];
+      data_by_supplier_code[item.supplier_code] = [item.amount * item.volume_per_unit, [item.delivery_slip_number]];
     }
   }
   for (var key in data_by_supplier_code) {
+    delivery_slip_numbers = Array.from(new Set(data_by_supplier_code[key][1])).join(";")
     tbody_html += `<tr>
       <td>${key}</td>
       <td>${Math.round(data_by_supplier_code[key][0]*100)/100}</td>
-      <td>${data_by_supplier_code[key][1]}</td>
+      <td>${delivery_slip_numbers}</td>
     </tr>`
     tbody.innerHTML = tbody_html;
-    output_data += `${key},${Math.round(data_by_supplier_code[key][0]*100)/100},${data_by_supplier_code[key][1]}\n`
+    output_data += `${key},${Math.round(data_by_supplier_code[key][0]*100)/100},${delivery_slip_numbers}\n`
   }
 
   message.innerHTML = items.length + "件のデータを読み込みました。"
