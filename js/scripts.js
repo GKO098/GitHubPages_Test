@@ -463,7 +463,7 @@ fileReader.onload = () => {
       <td>${delivery_slip_numbers}</td>
     </tr>`
     tbody.innerHTML = tbody_html;
-    output_data += `${supplier_code},${weight_for_display},${delivery_slip_numbers}\n`
+    output_data += `${supplier_code},${weight_for_display},${postage},${delivery_slip_numbers}\n`
   }
 
   message.innerHTML = items.length + "件のデータを読み込みました。"
