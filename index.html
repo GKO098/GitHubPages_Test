@@ -31,6 +31,7 @@
             <tr>
               <th>取引先コード</th>
               <th>総積数（後で送料に変換）</th>
+              <th>送料</th>
               <th>納品書番号リスト</th>
             </tr>
           </thead>
@@ -41,21 +42,33 @@
     </div>
 
     <hr>
-    <h3 class="subtitle">計算に用いている送料の表</h3>
+    <h3 class="subtitle">計算に用いている送料の表[円]</h3>
     <div class="columns">
       <div class="column" style="overflow-y: scroll;">
         <table id="price_table" class="table is-bordered">
           <thead>
             <tr>
               <th></th>
-              <th align="center" colspan="5">重量</th>
+              <th align="center" colspan="16">重量[kg]</th>
             </tr>
             <tr>
-              <th>エリア</th>
-              <th>〜5</th>
-              <th>〜10</th>
-              <th>〜15</th>
-              <th>〜20</th>
+              <th>取引先コード</th>
+              <th align ="right">10</th>
+              <th align ="right">20</th>
+              <th align ="right">30</th>
+              <th align ="right">40</th>
+              <th align ="right">50</th>
+              <th align ="right">60</th>
+              <th align ="right">80</th>
+              <th align ="right">100</th>
+              <th align ="right">120</th>
+              <th align ="right">140</th>
+              <th align ="right">150</th>
+              <th align ="right">160</th>
+              <th align ="right">180</th>
+              <th align ="right">200</th>
+              <th align ="right">250</th>
+              <th align ="right">300</th>
             </tr>
           </thead>
           <tbody>
