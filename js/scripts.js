@@ -317,7 +317,7 @@ function get_postage(supplier_code, weight) {
     }
     return postage
   }
-  return "不明な取引先コードです"
+  return "不明な取引先コードです（" + supplier_code + "）"
 }
 
 function get_weight(item_type, amount) {
