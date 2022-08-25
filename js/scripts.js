@@ -306,7 +306,7 @@ function get_postage(supplier_code, weight) {
   if (supplier_code in price_table) {
     console.log(supplier_code)
     price_list = price_table[supplier_code];
-    weight_kg = weight * 3;  // 仮の数字です！
+    weight_kg = weight; // kgで入力されることになった
     weight_limits = [10, 20, 30, 40, 50, 60, 80, 100, 120, 140, 150, 160, 180, 200, 250, 300];
     postage = '重量計算ができない範囲です';
     for (weight_index in weight_limits) {
