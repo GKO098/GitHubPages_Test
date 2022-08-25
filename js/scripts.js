@@ -443,7 +443,7 @@ fileReader.onload = () => {
     </tr>`
     tbody.innerHTML = tbody_html;
     postage_without_tax = Math.round(postage/1.1)
-    kokuti_num = roundup(data_by_supplier_code[supplier_code][2] / 6.0) + roundup(data_by_supplier_code[supplier_code][3] / 12.0) + data_by_supplier_code[item.supplier_code][4]
+    kokuti_num = Math.ceil(data_by_supplier_code[supplier_code][2] / 6.0) + Math.ceil(data_by_supplier_code[supplier_code][3] / 12.0) + data_by_supplier_code[supplier_code][4]
     output_data += `${get_yyyymmdd("-")},${supplier_code},${postage_without_tax},${delivery_slip_numbers},${kokuti_num}\n`
   }
 
