@@ -312,7 +312,7 @@ function get_postage(supplier_code, weight) {
     for (weight_index in weight_limits) {
       if (weight_kg <= weight_limits[weight_index]) {
         postage = price_list[weight_index];
-        return postage
+        return Math.round(postage/1.1)
       }
     }
     return postage
