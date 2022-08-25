@@ -364,21 +364,19 @@ fileReader.onload = () => {
   // 先頭行をヘッダとして格納
   let header = fileResult[0].split(',')
   for (var head in header) { // 使いそうな物は変数名らしい名前に置き換える
-    if (header[head].match(/.*取引先コード \(得意先\).*/)) {
+    if (header[head].match(/^"取引先コード \(得意先\)"$/)) {
       header[head] = "supplier_code"
-    } else if (header[head].match(/.*納品書番号.*/)) {
+    } else if (header[head].match(/^納品書番号$/)) {
       header[head] = "delivery_slip_number"
-    } else if (header[head].match(/.*出荷指定日.*/)) {
-      header[head] = "shipment_date"
-    } else if (header[head].match(/.*納品数.*/)) {
+    } else if (header[head].match(/^納品数$/)) {
       header[head] = "amount"
-    } else if (header[head].match(/.*合計重量.*/)) {
+    } else if (header[head].match(/^"合計重量 \*"$/)) {
       header[head] = "volume"
-    } else if (header[head].match(/請求用分類 \* \(品目\)/)) {
+    } else if (header[head].match(/^"請求用分類 \* \(品目\)"$/)) {
       header[head] = "type_of_charge"
-    } else if (header[head].match(/ケース/)) {
+    } else if (header[head].match(/^ケース$/)) {
       header[head] = "case_num"
-    } else if (header[head].match(/容量 \* \(品目\)/)) {
+    } else if (header[head].match(/^"容量 \* \(品目\)"$/)) {
       header[head] = "capacity"
     }
   }
