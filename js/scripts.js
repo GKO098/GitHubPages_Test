@@ -430,10 +430,15 @@ fileReader.onload = () => {
 
   message.innerHTML = items.length + "件のデータを読み込みました。"
   
+  // shift-jisに変換
+  unicodeArray = Encoding.stringToCode(output_data);
+  convert = Encoding.convert(unicodeArray, {to: 'SJIS', from: 'UNICODE'});
+  u8a = new Uint8Array(convert);
   // ダウンロード関連
   let bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
-  let blob = new Blob([bom, output_data], {'type' : 'text/csv'});
-
+  let blob = new Blob([u8a], {'type' : 'text/csv'});
+  
+  
   let downloadLink = document.createElement('a');
   downloadLink.download = '日通送料_' + get_yyyymmdd("") + '.csv';
   downloadLink.href = URL.createObjectURL(blob);
