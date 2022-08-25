@@ -308,7 +308,7 @@ function get_postage(supplier_code, weight) {
     price_list = price_table[supplier_code];
     weight_kg = weight; // kgで入力されることになった
     weight_limits = [10, 20, 30, 40, 50, 60, 80, 100, 120, 140, 150, 160, 180, 200, 250, 300];
-    postage = '重量計算ができない範囲です';
+    postage = '重量計算ができない範囲です（300 kg超）';
     for (weight_index in weight_limits) {
       if (weight_kg <= weight_limits[weight_index]) {
         postage = price_list[weight_index];
