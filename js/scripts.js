@@ -405,12 +405,12 @@ fileReader.onload = () => {
   let tbody_html = "";
   let output_data = "納品日,得意先,納品単価,メーカー伝票番号 *,概算個口数 *\n";
   let data_by_supplier_code = {}
-  tomorrow = get_tomorrow()
+
   for (item of items) { // 出荷指定日が今日以前の物を読み込み
     if (!item.supplier_code) { //空白行は追加しない（主に最後の空行）
       continue;
     }
-    if (item.shipment_date >= tomorrow) { // 出荷指定日が明日以降なら追加しない
+    if (item.amount < 0) {
       continue;
     }
 
