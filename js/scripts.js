@@ -330,13 +330,12 @@ function get_weight(item_type, amount) {
   return NaN;
 }
 
-
-function get_tomorrow() {
+function get_yyyymmdd(delimeter) {
   const today = new Date()
   var yyyy = today.getFullYear();
   var mm = ('0' + (today.getMonth() + 1)).slice(-2);
-  var dd = ('0' + today.getDate() + 1).slice(-2);
-  return (yyyy + '-' + mm + '-' + dd);
+  var dd = ('0' + today.getDate()).slice(-2);
+  return (yyyy + delimeter + mm + delimeter + dd);
 }
 
 let fileInput = document.getElementById('csv_file');
@@ -436,7 +435,7 @@ fileReader.onload = () => {
   let blob = new Blob([bom, output_data], {'type' : 'text/csv'});
 
   let downloadLink = document.createElement('a');
-  downloadLink.download = 'output.csv';
+  downloadLink.download = '日通送料_' + get_yyyymmdd("") + '.csv';
   downloadLink.href = URL.createObjectURL(blob);
   downloadLink.dataset.downloadurl = ['text/plain', downloadLink.download, downloadLink.href].join(':');
   downloadLink.click();
