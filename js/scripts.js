@@ -372,8 +372,14 @@ fileReader.onload = () => {
       header[head] = "shipment_date"
     } else if (header[head].match(/.*納品数.*/)) {
       header[head] = "amount"
-    } else if (header[head].match(/.*積数.*/)) {
-      header[head] = "volume_per_unit"
+    } else if (header[head].match(/.*合計重量.*/)) {
+      header[head] = "volume"
+    } else if (header[head].match(/請求用分類 \* \(品目\)/)) {
+      header[head] = "type_of_charge"
+    } else if (header[head].match(/ケース/)) {
+      header[head] = "case_num"
+    } else if (header[head].match(/容量 \* \(品目\)/)) {
+      header[head] = "capacity"
     }
   }
   // 先頭行の削除
@@ -397,7 +403,7 @@ fileReader.onload = () => {
 
   //　CSVの内容を表示
   let tbody_html = "";
-  let output_data = "";
+  let output_data = "納品日,得意先,納品単価,メーカー伝票番号 *,概算個口数 *\n";
   let data_by_supplier_code = {}
   tomorrow = get_tomorrow()
   for (item of items) { // 出荷指定日が今日以前の物を読み込み
@@ -407,11 +413,24 @@ fileReader.onload = () => {
     if (item.shipment_date >= tomorrow) { // 出荷指定日が明日以降なら追加しない
       continue;
     }
-    if (item.supplier_code in data_by_supplier_code) {
-      data_by_supplier_code[item.supplier_code][0] += item.amount * item.volume_per_unit;
-      data_by_supplier_code[item.supplier_code][1].push(item.delivery_slip_number);
-    } else {
-      data_by_supplier_code[item.supplier_code] = [item.amount * item.volume_per_unit, [item.delivery_slip_number]];
+
+    // data_by_supplier_code[item.supplier_code]
+    // [0]: weight[hg]
+    // [1]: 伝票番号のリスト
+    // [2]: 容量が1800である商品の数
+    // [3]: 容量が720である商品の数
+    // [4]: 容量が1800でも720でもなく、種別が03食品である商品のケース数
+    if (!(item.supplier_code in data_by_supplier_code)) {
+      data_by_supplier_code[item.supplier_code] = [0, [], 0, 0, 0.0];
+    }
+    data_by_supplier_code[item.supplier_code][0] += parseFloat(item.volume);
+    data_by_supplier_code[item.supplier_code][1].push(item.delivery_slip_number);
+    if (parseInt(item.capacity) == 1800) {
+      data_by_supplier_code[item.supplier_code][2] += parseInt(item.amount)
+    } else if (parseInt(item.capacity) == 720) {
+      data_by_supplier_code[item.supplier_code][3] += parseInt(item.amount);
+    } else if (item.type_of_charge != "03食品") {
+      data_by_supplier_code[item.supplier_code][4] += parseFloat(item.case_num);
     }
   }
   for (var supplier_code in data_by_supplier_code) {
@@ -425,7 +444,9 @@ fileReader.onload = () => {
       <td>${delivery_slip_numbers}</td>
     </tr>`
     tbody.innerHTML = tbody_html;
-    output_data += `${supplier_code},${weight_for_display},${postage},${delivery_slip_numbers}\n`
+    postage_without_tax = Math.round(postage/1.1)
+    kokuti_num = roundup(data_by_supplier_code[supplier_code][2] / 6.0) + roundup(data_by_supplier_code[supplier_code][3] / 12.0) + data_by_supplier_code[item.supplier_code][4]
+    output_data += `${get_yyyymmdd("-")},${supplier_code},${postage_without_tax},${delivery_slip_numbers},${kokuti_num}\n`
   }
 
   message.innerHTML = items.length + "件のデータを読み込みました。"
