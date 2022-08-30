@@ -380,6 +380,8 @@ fileReader.onload = () => {
       header[head] = "case_num"
     } else if (header[head].match(/^"容量 \* \(品目\)"$/)) {
       header[head] = "capacity"
+    } else if (header[head].match(/^合計税込金額$/)) {
+      header[head] = "total_intax_price"
     }
   }
   // 先頭行の削除
@@ -403,10 +405,10 @@ fileReader.onload = () => {
 
   //　CSVの内容を表示
   let tbody_html = "";
-  let output_data = "納品日,得意先,納品単価,メーカー伝票番号 *,概算個口数 *\n";
+  let output_data = "納品日,得意先,納品単価,メーカー伝票番号 *,概算個口数 *,合計重量,保険金額\n";
   let data_by_supplier_code = {}
 
-  for (item of items) { // 出荷指定日が今日以前の物を読み込み
+  for (item of items) {
     if (!item.supplier_code) { //空白行は追加しない（主に最後の空行）
       continue;
     }
@@ -420,8 +422,9 @@ fileReader.onload = () => {
     // [2]: 容量が1800である商品の数
     // [3]: 容量が720である商品の数
     // [4]: 容量が1800でも720でもなく、種別が03食品である商品のケース数
+    // [5]: 税込合計金額
     if (!(item.supplier_code in data_by_supplier_code)) {
-      data_by_supplier_code[item.supplier_code] = [0, [], 0, 0, 0.0];
+      data_by_supplier_code[item.supplier_code] = [0, [], 0, 0, 0.0, 0];
     }
     data_by_supplier_code[item.supplier_code][0] += parseFloat(item.volume);
     data_by_supplier_code[item.supplier_code][1].push(item.delivery_slip_number);
@@ -432,8 +435,10 @@ fileReader.onload = () => {
     } else if (item.type_of_charge != "03食品") {
       data_by_supplier_code[item.supplier_code][4] += parseFloat(item.case_num);
     }
+    data_by_supplier_code[item.supplier_code][5] = parseInt(item.total_intax_price)
   }
   for (var supplier_code in data_by_supplier_code) {
+    console.log(data_by_supplier_code[supplier_code])
     weight_for_display = Math.round(data_by_supplier_code[supplier_code][0]*100)/100;
     postage = get_postage(supplier_code, weight_for_display)
     postage_without_tax = Math.round(postage/1.1)
@@ -447,7 +452,8 @@ fileReader.onload = () => {
     </tr>`
     tbody.innerHTML = tbody_html;
     kokuti_num = Math.ceil(data_by_supplier_code[supplier_code][2] / 6.0) + Math.ceil(data_by_supplier_code[supplier_code][3] / 12.0) + data_by_supplier_code[supplier_code][4]
-    output_data += `${get_yyyymmdd("-")},${supplier_code},${postage_without_tax},${delivery_slip_numbers},${kokuti_num}\n`
+    insurance_price = Math.ceil(data_by_supplier_code[supplier_code][5] / 10000)
+    output_data += `${get_yyyymmdd("-")},${supplier_code},${postage_without_tax},${delivery_slip_numbers},${kokuti_num},${weight_for_display},${insurance_price}\n`
   }
 
   message.innerHTML = items.length + "件のデータを読み込みました。"
