@@ -306,7 +306,6 @@ for (var key in price_table) {
 
 function get_postage(supplier_code, weight) {
   if (supplier_code in price_table) {
-    console.log(supplier_code)
     price_list = price_table[supplier_code];
     weight_kg = weight; // kgで入力されることになった
     weight_limits = [10, 20, 30, 40, 50, 60, 80, 100, 120, 140, 160, 180, 200, 250, 300];
@@ -427,7 +426,11 @@ fileReader.onload = () => {
       data_by_supplier_code[item.supplier_code] = [0, [], 0, 0, 0.0, 0];
     }
     data_by_supplier_code[item.supplier_code][0] += parseFloat(item.volume);
-    data_by_supplier_code[item.supplier_code][1].push(item.delivery_slip_number);
+    if (!(data_by_supplier_code[item.supplier_code][1].includes(item.delivery_slip_number))){
+      // 新規伝票の場合のみ、伝票番号と税込合計金額を足す。
+      data_by_supplier_code[item.supplier_code][1].push(item.delivery_slip_number);
+      data_by_supplier_code[item.supplier_code][5] += parseInt(item.total_intax_price);
+    }
     if (parseInt(item.capacity) == 1800) {
       data_by_supplier_code[item.supplier_code][2] += parseInt(item.amount)
     } else if (parseInt(item.capacity) == 720) {
@@ -435,14 +438,12 @@ fileReader.onload = () => {
     } else if (item.type_of_charge != "03食品") {
       data_by_supplier_code[item.supplier_code][4] += parseFloat(item.case_num);
     }
-    data_by_supplier_code[item.supplier_code][5] = parseInt(item.total_intax_price)
   }
   for (var supplier_code in data_by_supplier_code) {
-    console.log(data_by_supplier_code[supplier_code])
     weight_for_display = Math.round(data_by_supplier_code[supplier_code][0]*100)/100;
     postage = get_postage(supplier_code, weight_for_display)
     postage_without_tax = Math.round(postage/1.1)
-    delivery_slip_numbers = Array.from(new Set(data_by_supplier_code[supplier_code][1])).join(";")
+    delivery_slip_numbers = data_by_supplier_code[supplier_code][1].join(";");
     tbody_html += `<tr>
       <td align="right">${supplier_code}</td>
       <td align="right">${weight_for_display}</td>
@@ -452,7 +453,7 @@ fileReader.onload = () => {
     </tr>`
     tbody.innerHTML = tbody_html;
     kokuti_num = Math.ceil(data_by_supplier_code[supplier_code][2] / 6.0) + Math.ceil(data_by_supplier_code[supplier_code][3] / 12.0) + data_by_supplier_code[supplier_code][4]
-    insurance_price = Math.ceil(data_by_supplier_code[supplier_code][5] / 10000)
+    insurance_price = Math.ceil(data_by_supplier_code[supplier_code][5] / 10000.0);
     output_data += `${get_yyyymmdd("-")},${supplier_code},${postage_without_tax},${delivery_slip_numbers},${kokuti_num},${weight_for_display},${insurance_price}\n`
   }
 
