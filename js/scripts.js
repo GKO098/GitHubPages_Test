@@ -318,7 +318,7 @@ function get_postage(supplier_code, weight) {
     }
     return postage
   }
-  return "不明な取引先コードです（" + supplier_code + "）"
+  return "" // "不明な取引先コードです（" + supplier_code + "）"
 }
 
 function get_weight(item_type, amount) {
@@ -442,7 +442,11 @@ fileReader.onload = () => {
   for (var supplier_code in data_by_supplier_code) {
     weight_for_display = Math.round(data_by_supplier_code[supplier_code][0]*100)/100;
     postage = get_postage(supplier_code, weight_for_display)
-    postage_without_tax = Math.round(postage/1.1)
+    if (postage == "") {  // supplier_codeが表に見つからない場合送料は空
+      postage_without_tax = ""
+    } else {
+      postage_without_tax = Math.round(postage/1.1)
+    }
     delivery_slip_numbers = data_by_supplier_code[supplier_code][1].join(";");
     tbody_html += `<tr>
       <td align="right">${supplier_code}</td>
