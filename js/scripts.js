@@ -403,7 +403,7 @@ fileReader.onload = () => {
 
   //　CSVの内容を表示
   let tbody_html = "";
-  let output_data = "納品日,得意先,納品単価,メーカー伝票番号 *,概算個口数 *,合計重量,保険金額\n";
+  let output_data = "納品日,得意先,納品単価,メーカー伝票番号 *,概算個口数 *,合計重量,保険金額,請求用納品書番号\n";
   let data_by_supplier_code = {}
 
   for (item of items) {
@@ -457,7 +457,12 @@ fileReader.onload = () => {
     tbody.innerHTML = tbody_html;
     kokuti_num = Math.ceil(data_by_supplier_code[supplier_code][2] / 6.0) + Math.ceil(data_by_supplier_code[supplier_code][3] / 12.0) + data_by_supplier_code[supplier_code][4]
     insurance_price = Math.ceil(data_by_supplier_code[supplier_code][5] / 10000.0);
-    output_data += `${get_yyyymmdd("-")},${supplier_code},${postage_without_tax},${delivery_slip_numbers},${kokuti_num},${weight_for_display},${insurance_price}\n`
+    delivery_slip_numbers_for_bill = data_by_supplier_code[supplier_code][1].sort(function(a, b){
+      if (parseInt(a.match(/[0-9]+/)) < parseInt(b.match(/[0-9]+/))) return -1;
+      if (parseInt(a.match(/[0-9]+/)) > parseInt(b.match(/[0-9]+/))) return 1;
+      return 0;
+    })[0]
+    output_data += `${get_yyyymmdd("-")},${supplier_code},${postage_without_tax},${delivery_slip_numbers},${kokuti_num},${weight_for_display},${insurance_price},${delivery_slip_numbers_for_bill}\n`
   }
 
   message.innerHTML = items.length + "件のデータを読み込みました。"
