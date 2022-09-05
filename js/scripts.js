@@ -457,11 +457,7 @@ fileReader.onload = () => {
     tbody.innerHTML = tbody_html;
     kokuti_num = Math.ceil(data_by_supplier_code[supplier_code][2] / 6.0) + Math.ceil(data_by_supplier_code[supplier_code][3] / 12.0) + data_by_supplier_code[supplier_code][4]
     insurance_price = Math.ceil(data_by_supplier_code[supplier_code][5] / 10000.0);
-    delivery_slip_numbers_for_bill = data_by_supplier_code[supplier_code][1].sort(function(a, b){
-      if (parseInt(a.match(/[0-9]+/)) < parseInt(b.match(/[0-9]+/))) return -1;
-      if (parseInt(a.match(/[0-9]+/)) > parseInt(b.match(/[0-9]+/))) return 1;
-      return 0;
-    })[0]
+    delivery_slip_numbers_for_bill = data_by_supplier_code[supplier_code][1].sort()[0]
     output_data += `${get_yyyymmdd("-")},${supplier_code},${postage_without_tax},${delivery_slip_numbers},${kokuti_num},${weight_for_display},${insurance_price},${delivery_slip_numbers_for_bill}\n`
   }
 
