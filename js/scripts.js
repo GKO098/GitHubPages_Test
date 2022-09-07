@@ -378,8 +378,10 @@ fileReader.onload = () => {
       header[head] = "case_num"
     } else if (header[head].match(/^"容量 \* \(品目\)"$/)) {
       header[head] = "capacity"
-    } else if (header[head].match(/^合計税込金額$/)) {
-      header[head] = "total_intax_price"
+    } else if (header[head].match(/^金額$/)) {
+      header[head] = "price"
+    } else if (header[head].match(/^税率$/)) {
+      header[head] = "tax_rate"
     }
   }
   // 先頭行の削除
@@ -420,7 +422,7 @@ fileReader.onload = () => {
     // [2]: 容量が1800である商品の数
     // [3]: 容量が720である商品の数
     // [4]: 容量が1800でも720でもなく、種別が03食品である商品のケース数
-    // [5]: 税込合計金額
+    // [5]: 税込合計金額（各行で、税込金額を計算して四捨五入）
     if (!(item.supplier_code in data_by_supplier_code)) {
       data_by_supplier_code[item.supplier_code] = [0, [], 0, 0, 0.0, 0];
     }
@@ -428,7 +430,7 @@ fileReader.onload = () => {
     if (!(data_by_supplier_code[item.supplier_code][1].includes(item.delivery_slip_number))){
       // 新規伝票の場合のみ、伝票番号と税込合計金額を足す。
       data_by_supplier_code[item.supplier_code][1].push(item.delivery_slip_number);
-      data_by_supplier_code[item.supplier_code][5] += parseInt(item.total_intax_price);
+      data_by_supplier_code[item.supplier_code][5] += Math.round(parseInt(item.price) * (1.0 + parseInt(item.tax_rate) / 100.0));
     }
     if (parseInt(item.capacity) == 1800) {
       data_by_supplier_code[item.supplier_code][2] += parseInt(item.amount)
