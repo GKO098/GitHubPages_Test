@@ -430,9 +430,8 @@ fileReader.onload = () => {
     }
     data_by_supplier_code[item.supplier_code][0] += parseFloat(item.volume);
     if (!(data_by_supplier_code[item.supplier_code][1].includes(item.delivery_slip_number))){
-      // 新規伝票の場合のみ、伝票番号と税込合計金額を足す。
+      // 新規伝票の場合のみ、伝票番号を足す。
       data_by_supplier_code[item.supplier_code][1].push(item.delivery_slip_number);
-      data_by_supplier_code[item.supplier_code][5] += Math.round(parseInt(item.price) * (1.0 + parseInt(item.tax_rate) / 100.0));
     }
     if (parseInt(item.capacity) == 1800) {
       data_by_supplier_code[item.supplier_code][2] += parseInt(item.amount)
@@ -441,6 +440,7 @@ fileReader.onload = () => {
     } else if (item.type_of_charge != "03食品") {
       data_by_supplier_code[item.supplier_code][4] += parseFloat(item.case_num);
     }
+    data_by_supplier_code[item.supplier_code][5] += Math.round(parseInt(item.price) * (1.0 + parseInt(item.tax_rate) / 100.0));
   }
   for (var supplier_code in data_by_supplier_code) {
     weight_for_display = Math.round(data_by_supplier_code[supplier_code][0]*100)/100;
