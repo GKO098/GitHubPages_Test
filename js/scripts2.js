@@ -384,7 +384,7 @@ fileReader.onload = () => {
       header[head] = "price"
     } else if (header[head].match(/^税率$/)) {
       header[head] = "tax_rate"
-    } else if (header[head].match(/^取引先コード \(納入先\)$/)) {
+    } else if (header[head].match(/^"取引先コード \(納入先\)"$/)) {
       header[head] = "destination_code"
     }
   }
