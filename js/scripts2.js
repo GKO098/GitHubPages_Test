@@ -451,7 +451,12 @@ fileReader.onload = () => {
     supplier_code = key.split(":")[0]
     destination_code = key.split(":")[1]
     weight_for_display = Math.round(data_by_supplier_code[key][0]*100)/100;
-    postage = get_postage(key, weight_for_display)
+    if (destination_code != "") {
+      get_postage(destination_code, weight_for_display)
+    } else {
+      postage = get_postage(supplier_code, weight_for_display)
+    }
+
     if (postage == "") {  // supplier_codeが表に見つからない場合送料は空
       postage_without_tax = ""
     } else {
