@@ -452,25 +452,32 @@ fileReader.onload = () => {
     supplier_code = key.split(":")[0]
     destination_code = key.split(":")[1]
     weight_for_display = Math.round(data_by_supplier_code[key][0]*100)/100;
+
+    postage_display_color = "black"
     if (destination_code != "") {
-      get_postage(destination_code, weight_for_display)
+      postage = get_postage(destination_code, weight_for_display)
+      if (postage == "") {  // 納入先が書かれているけど表にない場合には得意先
+        postage = get_postage(supplier_code, weight_for_display)
+        postage_display_color = "red"
+      }
     } else {
       postage = get_postage(supplier_code, weight_for_display)
     }
 
     if (postage == "") {  // supplier_codeが表に見つからない場合送料は空
       postage_without_tax = ""
+      postage_display_color = "black"
     } else {
       postage_without_tax = Math.round(postage/1.1)
     }
     delivery_slip_numbers = data_by_supplier_code[key][1].join(";");
     tbody_html += `<tr>
-      <td align="right">${supplier_code}</td>
-      <td align="right">${weight_for_display}</td>
-      <td align="right">${postage}</td>
-      <td align="right">${postage_without_tax}</td>
-      <td>${delivery_slip_numbers}</td>
-      <td align="right">${destination_code}</td>
+      <td align="right"><font color="${postage_display_color}">${supplier_code}</font></td>
+      <td align="right"><font color="${postage_display_color}">${weight_for_display}</font></td>
+      <td align="right"><font color="${postage_display_color}">${postage}</font></td>
+      <td align="right"><font color="${postage_display_color}">${postage_without_tax}</font></td>
+      <td><font color="${postage_display_color}">${delivery_slip_numbers}</font></td>
+      <td align="right"><font color="${postage_display_color}">${destination_code}</font></td>
     </tr>`
     tbody.innerHTML = tbody_html;
     kokuti_num = Math.ceil(data_by_supplier_code[key][2] / 6.0) + Math.ceil(data_by_supplier_code[key][3] / 12.0) + data_by_supplier_code[key][4]
