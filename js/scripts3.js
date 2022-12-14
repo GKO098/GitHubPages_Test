@@ -412,7 +412,7 @@ fileReader.onload = () => {
 
   //　CSVの内容を表示
   let tbody_html = "";
-  let output_data = "納品日,得意先,納品単価,メーカー伝票番号 *,概算個口数 *,合計重量,保険金額,請求用納品書番号,納入先コード\n";
+  let output_data = "納品日,得意先,納品単価,メーカー伝票番号 *,概算個口数 *,合計重量,保険金額,請求用納品書番号,納入先コード,計上日\n";
   let data_by_supplier_code = {}
 
   for (item of items) {
@@ -430,8 +430,9 @@ fileReader.onload = () => {
     // [3]: 容量が720である商品の数
     // [4]: 容量が1800でも720でもなく、種別が03食品以外の商品のケース数
     // [5]: 税込合計金額（各行で、税込金額を計算して四捨五入）
+    // [6]: 最も遅い計上日
     if (!(item.supplier_code + ":" + item.destination_code in data_by_supplier_code)) {
-      data_by_supplier_code[item.supplier_code + ":" + item.destination_code] = [0, [], 0, 0, 0.0, 0];
+      data_by_supplier_code[item.supplier_code + ":" + item.destination_code] = [0, [], 0, 0, 0.0, 0, ""];
     }
     data_by_supplier_code[item.supplier_code + ":" + item.destination_code][0] += parseFloat(item.volume);
     if (!(data_by_supplier_code[item.supplier_code + ":" + item.destination_code][1].includes(item.delivery_slip_number))){
@@ -446,6 +447,8 @@ fileReader.onload = () => {
       data_by_supplier_code[item.supplier_code + ":" + item.destination_code][4] += parseFloat(item.case_num);
     }
     data_by_supplier_code[item.supplier_code + ":" + item.destination_code][5] += Math.round(parseInt(item.price) * (1.0 + parseInt(item.tax_rate) / 100.0));
+    
+    data_by_supplier_code[item.supplier_code + ":" + item.destination_code][6] = data_by_supplier_code[item.supplier_code + ":" + item.destination_code][6] < item.accounting_date ? item.accounting_date : data_by_supplier_code[item.supplier_code + ":" + item.destination_code][6]
   }
 
   for (var key in data_by_supplier_code) {
@@ -454,6 +457,7 @@ fileReader.onload = () => {
     supplier_code = key.split(":")[0]
     destination_code = key.split(":")[1]
     weight_for_display = Math.round(data_by_supplier_code[key][0]*100)/100;
+    last_accounting_date = data_by_supplier_code[key][6]
 
     postage_display_color = "black"
     if (destination_code != "") {
@@ -480,12 +484,14 @@ fileReader.onload = () => {
       <td align="right"><font color="${postage_display_color}">${postage_without_tax}</font></td>
       <td><font color="${postage_display_color}">${delivery_slip_numbers}</font></td>
       <td align="right"><font color="${postage_display_color}">${destination_code}</font></td>
+      <td align="right"><font color="${postage_display_color}">${last_accounting_date}</font></td>
     </tr>`
     tbody.innerHTML = tbody_html;
     kokuti_num = Math.ceil(data_by_supplier_code[key][2] / 6.0) + Math.ceil(data_by_supplier_code[key][3] / 12.0) + data_by_supplier_code[key][4]
     insurance_price = Math.ceil(data_by_supplier_code[key][5] / 10000.0);
     delivery_slip_numbers_for_bill = data_by_supplier_code[key][1].sort()[0]
-    output_data += `${get_yyyymmdd("-")},${supplier_code},${postage_without_tax},${delivery_slip_numbers},${kokuti_num},${weight_for_display},${insurance_price},${delivery_slip_numbers_for_bill},${destination_code}\n`
+
+    output_data += `${get_yyyymmdd("-")},${supplier_code},${postage_without_tax},${delivery_slip_numbers},${kokuti_num},${weight_for_display},${insurance_price},${delivery_slip_numbers_for_bill},${destination_code},${last_accounting_date}\n`
   }
 
   message.innerHTML = items.length + "件のデータを読み込みました。"
