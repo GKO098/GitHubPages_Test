@@ -426,7 +426,7 @@ fileReader.onload = () => {
     // [1]: 伝票番号のリスト
     // [2]: 容量が1800である商品の数
     // [3]: 容量が720である商品の数
-    // [4]: 容量が1800でも720でもなく、種別が03食品である商品のケース数
+    // [4]: 容量が1800でも720でもなく、種別が03食品以外の商品のケース数
     // [5]: 税込合計金額（各行で、税込金額を計算して四捨五入）
     if (!(item.supplier_code + ":" + item.destination_code in data_by_supplier_code)) {
       data_by_supplier_code[item.supplier_code + ":" + item.destination_code] = [0, [], 0, 0, 0.0, 0];
