@@ -490,7 +490,7 @@ fileReader.onload = () => {
     kokuti_num_720 = data_by_supplier_code[key][3]
     kokuti_num_hasuu = Math.ceil(data_by_supplier_code[key][7] / 6.0 + data_by_supplier_code[key][8] / 12.0) // ケースあぶれ分はまとめてケースを計算。怪しいが仕様。
 
-    kokuti_num = kokuti_num_1800 + kokuti_num_720 + data_by_supplier_code[key][4]
+    kokuti_num = kokuti_num_1800 + kokuti_num_720 + Math.ceil(data_by_supplier_code[key][4])
     insurance_price = Math.ceil(data_by_supplier_code[key][5] / 10000.0);
     delivery_slip_numbers_for_bill = data_by_supplier_code[key][1].sort()[0]
 
