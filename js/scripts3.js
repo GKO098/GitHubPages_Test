@@ -383,6 +383,8 @@ fileReader.onload = () => {
       header[head] = "case_num"
     } else if (header[head].match(/^"容量 \* \(品目\)"$/)) {
       header[head] = "capacity"
+    } else if (header[head].match(/^"入数 \(品目\)"$/)) {
+      header[head] = "irisuu_item"
     } else if (header[head].match(/^金額$/)) {
       header[head] = "price"
     } else if (header[head].match(/^税率$/)) {
@@ -428,13 +430,15 @@ fileReader.onload = () => {
     // data_by_supplier_code[[item.supplier_code, item.destination_code]]
     // [0]: weight[hg]
     // [1]: 伝票番号のリスト
-    // [2]: 容量が1800である商品の数の辞書
-    // [3]: 容量が720である商品の数の辞書
+    // [2]: 容量が1800である商品のケース数
+    // [3]: 容量が720である商品のケース数
     // [4]: 容量が1800でも720でもなく、種別が03食品以外の商品のケース数
     // [5]: 税込合計金額（各行で、税込金額を計算して四捨五入）
     // [6]: 最も遅い計上日
+    // [7]: 容量が1800である商品の端数
+    // [8]: 容量が720である商品の端数
     if (!(item.supplier_code + ":" + item.destination_code in data_by_supplier_code)) {
-      data_by_supplier_code[item.supplier_code + ":" + item.destination_code] = [0, [], {}, {}, 0.0, 0, ""];
+      data_by_supplier_code[item.supplier_code + ":" + item.destination_code] = [0, [], 0, 0, 0.0, 0, "", 0, 0];
     }
 
     data_by_supplier_code[item.supplier_code + ":" + item.destination_code][0] += parseFloat(item.volume);
@@ -445,15 +449,11 @@ fileReader.onload = () => {
     }
     
     if (parseInt(item.capacity) == 1800) { // 1800mlを品目コード別に集計
-      if (!(item.item_code in data_by_supplier_code[item.supplier_code + ":" + item.destination_code][2])) {
-        data_by_supplier_code[item.supplier_code + ":" + item.destination_code][2][item.item_code] = 0
-      }
-      data_by_supplier_code[item.supplier_code + ":" + item.destination_code][2][item.item_code] += parseInt(item.amount)
+      data_by_supplier_code[item.supplier_code + ":" + item.destination_code][2] += Math.floor(parseInt(item.amount) / parseInt(item.irisuu_item))
+      data_by_supplier_code[item.supplier_code + ":" + item.destination_code][7] += parseInt(item.amount) % parseInt(item.irisuu_item)
     } else if (parseInt(item.capacity) == 720) { // 720mlを品目コード別に集計
-      if (!(item.item_code in data_by_supplier_code[item.supplier_code + ":" + item.destination_code][3])) {
-        data_by_supplier_code[item.supplier_code + ":" + item.destination_code][3][item.item_code] = 0
-      }
-      data_by_supplier_code[item.supplier_code + ":" + item.destination_code][3][item.item_code] += parseInt(item.amount);
+      data_by_supplier_code[item.supplier_code + ":" + item.destination_code][3] += Math.floor(parseInt(item.amount) / parseInt(item.irisuu_item))
+      data_by_supplier_code[item.supplier_code + ":" + item.destination_code][8] += parseInt(item.amount) % parseInt(item.irisuu_item)
     } else if (item.type_of_charge != "03食品") {
       data_by_supplier_code[item.supplier_code + ":" + item.destination_code][4] += parseFloat(item.case_num);
     }
@@ -486,14 +486,8 @@ fileReader.onload = () => {
       postage_without_tax = Math.round(postage/1.1)
     }
     delivery_slip_numbers = data_by_supplier_code[key][1].join(";");
-    kokuti_num_1800 = 0 // 仮置き。足していく
-    for (let item_code_in_1800 in data_by_supplier_code[key][2]) {
-      kokuti_num_1800 += Math.ceil(data_by_supplier_code[key][2][item_code_in_1800] / 6.0)
-    }
-    kokuti_num_720 = 0 // 仮置き。足していく
-    for (let item_code_in_720 in data_by_supplier_code[key][3]) {
-      kokuti_num_720 += Math.ceil(data_by_supplier_code[key][3][item_code_in_720] / 12.0)
-    }
+    kokuti_num_1800 = data_by_supplier_code[key][2] + Math.ceil(data_by_supplier_code[key][7] / 6.0)
+    kokuti_num_720 = data_by_supplier_code[key][3] + Math.ceil(data_by_supplier_code[key][8] / 12.0)
 
     kokuti_num = kokuti_num_1800 + kokuti_num_720 + data_by_supplier_code[key][4]
     insurance_price = Math.ceil(data_by_supplier_code[key][5] / 10000.0);
