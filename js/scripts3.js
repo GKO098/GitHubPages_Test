@@ -396,6 +396,10 @@ fileReader.onload = () => {
       header[head] = "destination_code"
     } else if (header[head].match(/^"計上日 \*"$/)) {
       header[head] = "accounting_date"
+    } else if (header[head].match(/^"日通指定着時間 \*"$/)) {
+      header[head] = "nittuu_appoint_destination_time"
+    } else if (header[head].match(/^"日通指定着日 \*"$/)) {
+      header[head] = "nittuu_appoint_destination_date"
     }
   }
   // 先頭行の削除
@@ -419,7 +423,7 @@ fileReader.onload = () => {
 
   //　CSVの内容を表示
   let tbody_html = "";
-  let output_data = "納品日,得意先,納品単価,メーカー伝票番号 *,概算個口数 *,合計重量,保険金額,請求用納品書番号,納入先コード,計上日\n";
+  let output_data = "納品日,得意先,納品単価,メーカー伝票番号 *,概算個口数 *,合計重量,保険金額,請求用納品書番号,納入先コード,計上日,日通指定着時間 *,日通指定着日 *\n";
   let data_by_supplier_code = {}
 
   for (item of items) {
@@ -431,15 +435,17 @@ fileReader.onload = () => {
     }
 
     // data_by_supplier_code[[item.supplier_code, item.destination_code]]
-    // [0]: weight[hg]
-    // [1]: 伝票番号のリスト
-    // [2]: 容量が1800である商品のケース数
-    // [3]: 容量が720である商品のケース数
-    // [4]: 容量が1800でも720でもなく、種別が03食品以外の商品のケース数
-    // [5]: 税込合計金額（各行で、税込金額を計算して四捨五入）
-    // [6]: 最も遅い計上日
-    // [7]: 容量が1800である商品の端数
-    // [8]: 容量が720である商品の端数
+    // [0]:  weight[kg]
+    // [1]:  伝票番号のリスト
+    // [2]:  容量が1800である商品のケース数
+    // [3]:  容量が720である商品のケース数
+    // [4]:  容量が1800でも720でもなく、種別が03食品以外の商品のケース数
+    // [5]:  税込合計金額（各行で、税込金額を計算して四捨五入）
+    // [6]:  最も遅い計上日
+    // [7]:  容量が1800である商品の端数
+    // [8]:  容量が720である商品の端数
+    // [9]:  日通指定着時間 *
+    // [10]: 日通指定着日 *
     if (!(item.supplier_code + ":" + item.destination_code in data_by_supplier_code)) {
       data_by_supplier_code[item.supplier_code + ":" + item.destination_code] = [0, [], 0, 0, 0.0, 0, "", 0, 0];
     }
@@ -463,6 +469,9 @@ fileReader.onload = () => {
     data_by_supplier_code[item.supplier_code + ":" + item.destination_code][5] += Math.round(parseInt(item.price) * (1.0 + parseInt(item.tax_rate) / 100.0));
     
     data_by_supplier_code[item.supplier_code + ":" + item.destination_code][6] = data_by_supplier_code[item.supplier_code + ":" + item.destination_code][6] < item.accounting_date ? item.accounting_date : data_by_supplier_code[item.supplier_code + ":" + item.destination_code][6]
+    
+    data_by_supplier_code[item.supplier_code + ":" + item.destination_code][9] = item.nittuu_appoint_destination_time
+    data_by_supplier_code[item.supplier_code + ":" + item.destination_code][10] = item.nittuu_appoint_destination_date
   }
 
   for (var key in data_by_supplier_code) {
@@ -497,6 +506,8 @@ fileReader.onload = () => {
     insurance_price = Math.ceil(data_by_supplier_code[key][5] / 10000.0);
     delivery_slip_numbers_for_bill = data_by_supplier_code[key][1].sort()[0]
 
+    nittuu_appoint_destination_time = data_by_supplier_code[key][9]
+    nittuu_appoint_destination_date = data_by_supplier_code[key][10]
 
     tbody_html += `<tr>
       <td align="right"><font color="${postage_display_color}">${supplier_code}</font></td>
@@ -507,9 +518,11 @@ fileReader.onload = () => {
       <td align="right"><font color="${postage_display_color}">${destination_code}</font></td>
       <td align="right"><font color="${postage_display_color}">${kokuti_num}</font></td>
       <td align="right"><font color="${postage_display_color}">${last_accounting_date}</font></td>
+      <td align="right"><font color="${postage_display_color}">${nittuu_appoint_destination_time}</font></td>
+      <td align="right"><font color="${postage_display_color}">${nittuu_appoint_destination_date}</font></td>
     </tr>`
     tbody.innerHTML = tbody_html;
-    output_data += `${get_yyyymmdd("-")},${supplier_code},${postage_without_tax},${delivery_slip_numbers},${kokuti_num},${weight_for_display},${insurance_price},${delivery_slip_numbers_for_bill},${destination_code},${last_accounting_date}\n`
+    output_data += `${get_yyyymmdd("-")},${supplier_code},${postage_without_tax},${delivery_slip_numbers},${kokuti_num},${weight_for_display},${insurance_price},${delivery_slip_numbers_for_bill},${destination_code},${last_accounting_date},${nittuu_appoint_destination_time},${nittuu_appoint_destination_date}\n`
   }
 
   message.innerHTML = items.length + "件のデータを読み込みました。"
