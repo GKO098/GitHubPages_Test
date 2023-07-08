@@ -444,10 +444,9 @@ fileReader.onload = () => {
     // [6]:  最も遅い計上日
     // [7]:  容量が1800である商品の端数
     // [8]:  容量が720である商品の端数
-    // [9]:  日通指定着時間 *
-    // [10]: 日通指定着日 *
+    // [9]:  (日通指定着時間 *, 日通指定着日 *)のタプルのリスト
     if (!(item.supplier_code + ":" + item.destination_code in data_by_supplier_code)) {
-      data_by_supplier_code[item.supplier_code + ":" + item.destination_code] = [0, [], 0, 0, 0.0, 0, "", 0, 0];
+      data_by_supplier_code[item.supplier_code + ":" + item.destination_code] = [0, [], 0, 0, 0.0, 0, "", 0, 0, []];
     }
 
     data_by_supplier_code[item.supplier_code + ":" + item.destination_code][0] += parseFloat(item.volume);
@@ -470,8 +469,8 @@ fileReader.onload = () => {
     
     data_by_supplier_code[item.supplier_code + ":" + item.destination_code][6] = data_by_supplier_code[item.supplier_code + ":" + item.destination_code][6] < item.accounting_date ? item.accounting_date : data_by_supplier_code[item.supplier_code + ":" + item.destination_code][6]
     
-    data_by_supplier_code[item.supplier_code + ":" + item.destination_code][9] = item.nittuu_appoint_destination_time
-    data_by_supplier_code[item.supplier_code + ":" + item.destination_code][10] = item.nittuu_appoint_destination_date
+    data_by_supplier_code[item.supplier_code + ":" + item.destination_code][9].push([item.nittuu_appoint_destination_time, item.nittuu_appoint_destination_date])
+
   }
 
   for (var key in data_by_supplier_code) {
@@ -506,8 +505,27 @@ fileReader.onload = () => {
     insurance_price = Math.ceil(data_by_supplier_code[key][5] / 10000.0);
     delivery_slip_numbers_for_bill = data_by_supplier_code[key][1].sort()[0]
 
-    nittuu_appoint_destination_time = data_by_supplier_code[key][9]
-    nittuu_appoint_destination_date = data_by_supplier_code[key][10]
+    // 日通の指定日は最も速い物を選ぶ
+    for (var i in data_by_supplier_code[key][9]) {
+      console.log(data_by_supplier_code[key][9][i]);
+    }
+    earliest_nittsu_appoing_destination_date_time = data_by_supplier_code[key][9].sort((a, b) => {
+      if (a[0] < b[0]){
+        return -1;
+      }
+      if (b[0] < a[0]){
+        return 1;
+      }
+      if (a[1] < b[1]){
+        return -1;
+      }
+      if (b[1] < a[1]){
+        return 1;
+      }
+      return 0;
+    })
+    nittuu_appoint_destination_time = earliest_nittsu_appoing_destination_date_time[1]
+    nittuu_appoint_destination_date = earliest_nittsu_appoing_destination_date_time[0]
 
     tbody_html += `<tr>
       <td align="right"><font color="${postage_display_color}">${supplier_code}</font></td>
