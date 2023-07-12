@@ -525,6 +525,9 @@ fileReader.onload = () => {
       return 0;
     })[0]
     nittuu_appoint_destination_time = earliest_nittsu_appoing_destination_date_time[1]
+    if (nittuu_appoint_destination_time ==  "なし") {
+      nittuu_appoint_destination_time = ""
+    }
     nittuu_appoint_destination_date = earliest_nittsu_appoing_destination_date_time[0]
 
     tbody_html += `<tr>
