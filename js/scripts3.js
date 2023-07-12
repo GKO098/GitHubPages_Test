@@ -469,7 +469,7 @@ fileReader.onload = () => {
     
     data_by_supplier_code[item.supplier_code + ":" + item.destination_code][6] = data_by_supplier_code[item.supplier_code + ":" + item.destination_code][6] < item.accounting_date ? item.accounting_date : data_by_supplier_code[item.supplier_code + ":" + item.destination_code][6]
     
-    data_by_supplier_code[item.supplier_code + ":" + item.destination_code][9].push([item.nittuu_appoint_destination_time, item.nittuu_appoint_destination_date])
+    data_by_supplier_code[item.supplier_code + ":" + item.destination_code][9].push([item.nittuu_appoint_destination_date, item.nittuu_appoint_destination_time])
 
   }
 
