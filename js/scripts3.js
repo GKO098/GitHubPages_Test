@@ -304,7 +304,7 @@ for (var key in price_table) {
   <td>${key}</td>
   `;
   for (var index in price_table[key]) {
-    table_html += `<td align = "right">${price_table[key][index]}</td>`;
+    table_html += `<td align = "right">${Math.round(price_table[key][index]/1.1)}</td>`;
   }
   table_html += `</tr>`;
   tbody_price.innerHTML += table_html;
