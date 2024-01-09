@@ -512,9 +512,9 @@ fileReader.onload = () => {
     delivery_slip_numbers_for_bill = data_by_supplier_code[key][1].sort()[0]
 
     // 日通の指定日は最も速い物を選ぶ
-    for (var i in data_by_supplier_code[key][9]) {
-      console.log(data_by_supplier_code[key][9][i]);
-    }
+    // for (var i in data_by_supplier_code[key][9]) {
+    //   console.log(data_by_supplier_code[key][9][i]);
+    // }
     earliest_nittsu_appoing_destination_date_time = data_by_supplier_code[key][9].sort((a, b) => {
       if (a[0] < b[0]){
         return -1;
@@ -553,7 +553,7 @@ fileReader.onload = () => {
     output_data += `${delivery_date},${supplier_code},${postage_without_tax},${delivery_slip_numbers},${kokuti_num},${weight_for_display},${insurance_price},${delivery_slip_numbers_for_bill},${destination_code},${last_accounting_date},${nittuu_appoint_destination_time},${nittuu_appoint_destination_date}\n`
   }
 
-  message.innerHTML = items.length + "件のデータを読み込みました。"
+  message.innerHTML = items.length + "行のデータを読み込みました。（先頭行を含む）"
   
   // shift-jisに変換
   unicodeArray = Encoding.stringToCode(output_data);
