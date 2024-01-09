@@ -371,7 +371,9 @@ fileReader.onload = () => {
   // 先頭行をヘッダとして格納
   let header = fileResult[0].split(',')
   for (var head in header) { // 使いそうな物は変数名らしい名前に置き換える
-    if (header[head].match(/^"取引先コード \(得意先\)"$/)) {
+    if (header[head].match(/^"納品日"$/)) {
+      header[head] = "delivery_date"
+    } else if (header[head].match(/^"取引先コード \(得意先\)"$/)) {
       header[head] = "supplier_code"
     } else if (header[head].match(/^納品書番号$/)) {
       header[head] = "delivery_slip_number"
@@ -446,8 +448,9 @@ fileReader.onload = () => {
     // [7]:  容量が1800である商品の端数
     // [8]:  容量が720である商品の端数
     // [9]:  (日通指定着時間 *, 日通指定着日 *)のタプルのリスト
+    // [10]: 納品日
     if (!(item.supplier_code + ":" + item.destination_code in data_by_supplier_code)) {
-      data_by_supplier_code[item.supplier_code + ":" + item.destination_code] = [0, [], 0, 0, 0.0, 0, "", 0, 0, []];
+      data_by_supplier_code[item.supplier_code + ":" + item.destination_code] = [0, [], 0, 0, 0.0, 0, "", 0, 0, [], ""];
     }
 
     data_by_supplier_code[item.supplier_code + ":" + item.destination_code][0] += parseFloat(item.volume);
@@ -471,6 +474,7 @@ fileReader.onload = () => {
     data_by_supplier_code[item.supplier_code + ":" + item.destination_code][6] = data_by_supplier_code[item.supplier_code + ":" + item.destination_code][6] < item.accounting_date ? item.accounting_date : data_by_supplier_code[item.supplier_code + ":" + item.destination_code][6]
     
     data_by_supplier_code[item.supplier_code + ":" + item.destination_code][9].push([item.nittuu_appoint_destination_date, item.nittuu_appoint_destination_time])
+    data_by_supplier_code[item.supplier_code + ":" + item.destination_code][10] = item.delivery_date
 
   }
 
@@ -530,6 +534,7 @@ fileReader.onload = () => {
       nittuu_appoint_destination_time = ""
     }
     nittuu_appoint_destination_date = earliest_nittsu_appoing_destination_date_time[0]
+    delivery_date = data_by_supplier_code[key][10]
 
     tbody_html += `<tr>
       <td align="right"><font color="${postage_display_color}">${supplier_code}</font></td>
@@ -544,7 +549,7 @@ fileReader.onload = () => {
       <td align="right"><font color="${postage_display_color}">${nittuu_appoint_destination_date}</font></td>
     </tr>`
     tbody.innerHTML = tbody_html;
-    output_data += `${get_yyyymmdd("-")},${supplier_code},${postage_without_tax},${delivery_slip_numbers},${kokuti_num},${weight_for_display},${insurance_price},${delivery_slip_numbers_for_bill},${destination_code},${last_accounting_date},${nittuu_appoint_destination_time},${nittuu_appoint_destination_date}\n`
+    output_data += `${delivery_date},${supplier_code},${postage_without_tax},${delivery_slip_numbers},${kokuti_num},${weight_for_display},${insurance_price},${delivery_slip_numbers_for_bill},${destination_code},${last_accounting_date},${nittuu_appoint_destination_time},${nittuu_appoint_destination_date}\n`
   }
 
   message.innerHTML = items.length + "件のデータを読み込みました。"
