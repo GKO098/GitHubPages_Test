@@ -372,7 +372,7 @@ fileReader.onload = () => {
   // 先頭行をヘッダとして格納
   let header = fileResult[0].split(',')
   for (var head in header) { // 使いそうな物は変数名らしい名前に置き換える
-    if (header[head].match(/^"納品日"$/)) {
+    if (header[head].match(/^納品日$/)) {
       header[head] = "delivery_date"
     } else if (header[head].match(/^"取引先コード \(得意先\)"$/)) {
       header[head] = "supplier_code"
